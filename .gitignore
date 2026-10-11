@@ -7,7 +7,7 @@ __pycache__/
 *$py.class
 zamp/
 venv/
-.venv/
+.env/
 
 # Local Database & Data
 data/*.db
