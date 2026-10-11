@@ -1,0 +1,19 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+zamp/
+venv/
+.venv/
+
+# Local Database & Data
+data/*.db
+data/inputs/
+data/cache/
+
+# Mac/Windows noise
+.DS_Store
+Thumbs.db

@@ -1,0 +1,9 @@
+streamlit
+google-generativeai
+pydantic
+pydantic-settings
+python-dotenv
+rapidfuzz
+reportlab
+pymupdf
+pandas
