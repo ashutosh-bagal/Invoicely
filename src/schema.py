@@ -11,10 +11,29 @@ class Outcome(str, Enum):
     REJECT = "REJECT"
 
 
-class ExtractInvoice(BaseModel):
+class RuleStatus(str, Enum):
+    PASS = "PASS"
+    WARN = "WARN"
+    FAIL = "FAIL"
+
+
+class RuleResult(BaseModel):
+    rule_name: str
+    status: RuleStatus
+    message: str
+
+
+class ExtractedInvoice(BaseModel):
     vendor_name: str
     invoice_number: str
     invoice_date: Optional[date] = None
     po_number: Optional[str] = None
     total: Decimal
     currency: str = "USD"
+    extraction_notes: Optional[str] = None
+
+
+class Decision(BaseModel):
+    outcome: Outcome
+    summary: str
+    trace: List[RuleResult]
