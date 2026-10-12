@@ -15,6 +15,14 @@ def seed_data():
     with get_connection() as conn:
         cursor = conn.cursor()
 
+        # Clear old data first so the seed is a true reset
+        cursor.execute("DELETE FROM processed_invoices")
+        cursor.execute("DELETE FROM purchase_orders")
+        cursor.execute("DELETE FROM vendors")
+        # AUTOINCREMENT keeps counting after DELETE; the POs below hardcode
+        # vendor ids 1-3, so restart the vendor id sequence.
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name IN ('vendors', 'processed_invoices')")
+
         # 1. Insert Vendors
         vendors = [
             ("Acme Corp", "Acme, Acme Co", "TX-12345"),

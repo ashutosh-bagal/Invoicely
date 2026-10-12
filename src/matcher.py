@@ -41,7 +41,7 @@ class BusinessRulesEngine:
         # RULE 1: Integrity Check (Did the AI find the basics?)
         if (
             not self.invoice.invoice_number
-            or not self.invoice.total
+            or self.invoice.total is None
             or not self.invoice.invoice_date
         ):
             self._add_rule(
@@ -64,7 +64,7 @@ class BusinessRulesEngine:
         # RULE 3: Vendor Verification (Fuzzy Matching)
         # We compare extracted 'Acme' vs database 'Acme Corp'
         vendor_similarity = fuzz.token_set_ratio(
-            self.invoice.vendor_name, po_data["vendor_name"]
+            self.invoice.vendor_name or "", po_data["vendor_name"]
         )
         if vendor_similarity < 85:
             self._add_rule(
@@ -78,7 +78,7 @@ class BusinessRulesEngine:
             )
 
         # RULE 4: Amount Validation (The Money)
-        inv_total = self.invoice.total
+        inv_total = self.invoice.total or Decimal("0")
         po_balance = Decimal(str(po_data["remaining_balance"]))
 
         if inv_total <= po_balance:

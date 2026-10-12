@@ -24,11 +24,11 @@ class RuleResult(BaseModel):
 
 
 class ExtractedInvoice(BaseModel):
-    vendor_name: str
-    invoice_number: str
+    vendor_name: Optional[str] = None
+    invoice_number: Optional[str] = None
     invoice_date: Optional[date] = None
     po_number: Optional[str] = None
-    total: Decimal
+    total: Optional[Decimal] = None
     currency: str = "USD"
     extraction_notes: Optional[str] = None
 

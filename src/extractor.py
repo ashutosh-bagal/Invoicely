@@ -3,7 +3,7 @@ import json
 from google import genai
 from google.genai import types
 from pydantic import ValidationError
-from schema import ExtractInvoice
+from src.schema import ExtractedInvoice
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -23,28 +23,27 @@ RULES:
 
 class InvoiceExtractor:
     def __init__(self):
-        self.client = genai.Client(key=os.getenv("GOOGLE_API_KEY"))
-        self.model = "gemini-1.5-flash"
+        self.client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+        self.model = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
 
-    def extract_from_path(self, file_path: Path) -> ExtractInvoice:
-        with open(file_path) as f:
+    def extract_from_path(self, file_path: Path) -> ExtractedInvoice:
+        with open(file_path, "rb") as f:
             pdf_bytes = f.read()
 
         response = self.client.models.generate_content(
             model=self.model,
-            content=[
-                SYSTEM_PROMPT,
+            contents=[
                 types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf"),
+                "Extract the invoice data from this document.",
             ],
             config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
                 response_mime_type="application/json",
-                response_schema=ExtractInvoice,
+                response_schema=ExtractedInvoice,
                 temperature=0,
             ),
         )
 
-        try:
+        if isinstance(response.parsed, ExtractedInvoice):
             return response.parsed
-        except Exception:
-            data = json.loads(response.text)
-            return ExtractInvoice(**data)
+        return ExtractedInvoice(**json.loads(response.text))
