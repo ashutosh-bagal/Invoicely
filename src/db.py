@@ -51,6 +51,38 @@ def init_db():
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        # 4. Run history (one row per pipeline execution, for the dashboard)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS runs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                filename TEXT,
+                file_hash TEXT,
+                status TEXT,            -- COMPLETED | FAILED | DUPLICATE
+                outcome TEXT,           -- APPROVE | REVIEW | REJECT (null if no decision)
+                summary TEXT,
+                error TEXT,
+                vendor_name TEXT,
+                invoice_number TEXT,
+                po_number TEXT,
+                total DECIMAL,
+                duration_s REAL,
+                extracted_json TEXT,
+                trace_json TEXT,
+                stages_json TEXT
+            )
+        """)
+        conn.commit()
+
+
+def reset_demo_state():
+    """Clears all run history and restores every PO to its full balance."""
+    init_db()
+    with get_connection() as conn:
+        conn.execute("DELETE FROM processed_invoices")
+        conn.execute("DELETE FROM runs")
+        conn.execute("UPDATE purchase_orders SET remaining_balance = total_amount")
         conn.commit()
 
 

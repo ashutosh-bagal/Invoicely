@@ -17,6 +17,7 @@ def seed_data():
 
         # Clear old data first so the seed is a true reset
         cursor.execute("DELETE FROM processed_invoices")
+        cursor.execute("DELETE FROM runs")
         cursor.execute("DELETE FROM purchase_orders")
         cursor.execute("DELETE FROM vendors")
         # AUTOINCREMENT keeps counting after DELETE; the POs below hardcode
